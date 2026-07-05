@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shidej — Dating a la Antigua 📜✨</title>
+  <meta name="description" content="Encuentra a tu alma gemela a través de la sabiduría de una casamentera tradicional judía. Un regreso interactivo al romanticismo de principios del siglo XX.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <div class="grain-overlay"></div>
+
+  <!-- Screen 0: Web Audio Enable Modal -->
+  <div id="screen-audio" class="audio-modal">
+    <div class="audio-modal-content">
+      <div class="audio-modal-icon">🔊</div>
+      <h2 class="call-title" style="margin-bottom: 1rem;">Bienvenido a Shidej</h2>
+      <p class="welcome-text" style="font-size: 1.15rem; color: var(--text-parchment-dark); margin-bottom: 2rem;">
+        Esta es una experiencia inmersiva que recrea sonidos mecánicos, estática analógica de líneas telefónicas de los años 30 y síntesis de voz procedimental.
+      </p>
+      <button id="btn-accept-audio" class="vintage-btn">Entrar con Audio</button>
+    </div>
+  </div>
+
+  <div id="app">
+    <header>
+      <h1>Shidej</h1>
+      <p>— Citas a la Antigua —</p>
+    </header>
+
+    <!-- Screen 1: Welcome -->
+    <div id="screen-welcome" class="screen hidden">
+      <div class="gold-panel">
+        <div class="welcome-logo">Shidej</div>
+        <p class="welcome-text">
+          "El amor verdadero no se desliza en una pantalla. Se teje con paciencia, se sella con el alma y se respeta con honor."
+        </p>
+        <p style="font-size: 1.2rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 2.5rem; font-style: italic;">
+          Para encontrar a tu compañera ideal, primero debes presentarte ante <strong>Yente</strong>, nuestra casamentera tradicional. Ella evaluará tu carácter con preguntas profundas e insidiosas. Si demuestras madurez, te presentará a personas afines con quienes deberás comunicarte... de la única forma respetable: llamando a su hogar.
+        </p>
+        <button id="btn-start-consultation" class="vintage-btn">Iniciar Consulta</button>
+      </div>
+    </div>
+
+    <!-- Screen 2: Yente Chat/Interview -->
+    <div id="screen-chat" class="screen hidden">
+      <div class="chat-container">
+        
+        <div class="matchmaker-portrait-container">
+          <div class="portrait-frame">
+            <img src="assets/yente.png" alt="Yente La Casamentera">
+          </div>
+          <div class="matchmaker-name">Yente</div>
+          <div class="matchmaker-title">Casamentera Tradicional</div>
+        </div>
+
+        <div class="chat-box">
+          <div id="chat-messages" class="chat-messages">
+            <!-- Messages typed procedurally -->
+          </div>
+          <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Escribe tu reflexión con sinceridad..." disabled></textarea>
+            <button id="btn-send" disabled>Responder</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Screen 3: Portrait Upload -->
+    <div id="screen-upload" class="screen hidden">
+      <div class="gold-panel">
+        <h2 class="call-title" style="margin-bottom: 0.5rem;">Tu Retrato Personal</h2>
+        <p class="welcome-text" style="font-size: 1.15rem; margin-bottom: 2rem;">
+          "Una sola imagen, joven. Sin artificios ni vanidad. Que muestre tus verdaderos ojos."
+        </p>
+
+        <div id="baroque-frame" class="baroque-frame">
+          <div class="upload-prompt">
+            <svg viewBox="0 0 24 24">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/>
+            </svg>
+            <p>Haz clic o arrastra tu retrato aquí</p>
+            <span style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Formatos: JPG, PNG</span>
+          </div>
+        </div>
+        <input type="file" id="upload-input" class="upload-input" accept="image/*">
+
+        <button id="btn-submit-portrait" class="vintage-btn" disabled>Presentar Retrato</button>
+      </div>
+    </div>
+
+    <!-- Screen 4: Assessment & Thinking -->
+    <div id="screen-thinking" class="screen hidden">
+      <div class="gold-panel" style="max-width: 550px;">
+        <div class="thinking-yente">
+          <img src="assets/yente.png" alt="Yente reflexionando">
+        </div>
+        <h2 class="call-title">Yente está reflexionando...</h2>
+        <p class="welcome-text" style="font-size: 1.2rem; margin-top: 1rem;">
+          "Déjame ver... he leído tu mente y he visto tu rostro. Hay un hilo rojo del destino que te conecta con alguien. Busquemos en mis registros..."
+        </p>
+        <div class="typing-indicator" style="justify-content: center; margin-top: 1.5rem;">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen 5: Matches List -->
+    <div id="screen-matches" class="screen hidden">
+      <h2 class="call-title" style="font-size: 2.2rem; margin-bottom: 0.2rem;">Tus Almas Compatibles</h2>
+      <p class="welcome-text" style="font-size: 1.15rem; margin-bottom: 1.5rem; text-align: center; max-width: 600px; color: var(--text-muted);">
+        "He encontrado tres damas de familias respetables cuyas almas resuenan con tus respuestas. Haz clic en su tarjeta para obtener su número e iniciar el cortejo."
+      </p>
+      
+      <div id="matches-grid" class="matches-grid">
+        <!-- Match cards rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Screen 6: Telephony & Call Dialing -->
+    <div id="screen-telephony" class="screen hidden">
+      <div class="calling-layout">
+        
+        <!-- Rotary Phone Interactive SVG -->
+        <div class="phone-ui-container">
+          <svg class="rotary-phone-svg" viewBox="0 0 400 450" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background shadowing -->
+            <ellipse cx="200" cy="410" rx="160" ry="25" fill="black" opacity="0.4"/>
+            
+            <!-- Metallic Cradle Forks -->
+            <path d="M120 130 L120 80 Q120 70 135 70 L140 70 Q145 70 145 80 L145 130 Z" fill="url(#brass-grad)"/>
+            <path d="M280 130 L280 80 Q280 70 265 70 L260 70 Q255 70 255 80 L255 130 Z" fill="url(#brass-grad)"/>
+            <rect x="110" y="120" width="180" height="20" rx="5" fill="#4a3b1f" stroke="#22190c"/>
+            
+            <!-- Main Phone Base Body -->
+            <path d="M90 390 L310 390 Q340 390 320 280 L270 160 Q260 140 200 140 Q140 140 130 160 L80 280 Q60 390 90 390 Z" fill="url(#bakelite-grad)" stroke="#0d0607" stroke-width="2"/>
+            
+            <!-- Golden details on base -->
+            <path d="M130 155 Q200 150 270 155" fill="none" stroke="#dfb15b" stroke-width="1.5" opacity="0.5"/>
+            
+            <!-- Dial Face Plate Background (Stationary numbers) -->
+            <circle cx="200" cy="240" r="105" fill="#dfb15b" stroke="#6b4c1b" stroke-width="3"/>
+            <circle cx="200" cy="240" r="92" fill="#f4ebd0" stroke="#dfb15b" stroke-width="1"/>
+            
+            <!-- Stationary numbers printed in counter-clockwise wheel position -->
+            <g font-family="Inter, sans-serif" font-weight="700" font-size="22" fill="#2b180d" text-anchor="middle" dominant-baseline="central">
+              <!-- Placed exactly under the holes at angles: 1:95, 2:65, 3:35, 4:5, 5:335, 6:305, 7:275, 8:245, 9:215, 0:185 -->
+              <text x="252" y="161">1</text>
+              <text x="272" y="205">2</text>
+              <text x="265" y="258">3</text>
+              <text x="238" y="300">4</text>
+              <text x="196" y="318">5</text>
+              <text x="154" y="311">6</text>
+              <text x="122" y="280">7</text>
+              <text x="108" y="235">8</text>
+              <text x="117" y="188">9</text>
+              <text x="144" y="151">0</text>
+            </g>
+
+            <!-- Rotating Dial Wheel (Sits on top, rotates dynamically) -->
+            <g id="dial-wheel" class="dial-wheel">
+              <!-- Outer circular wheel rim -->
+              <circle cx="200" cy="240" r="92" fill="rgba(20,10,12,0.82)" stroke="#dfb15b" stroke-width="2"/>
+              <!-- Inner center emblem -->
+              <circle cx="200" cy="240" r="32" fill="url(#brass-grad)" stroke="#1a0d03" stroke-width="2"/>
+              <circle cx="200" cy="240" r="28" fill="#1f050b" />
+              
+              <!-- Finger Holes positioned exactly at angles: 95, 65, 35, 5, 335, 305, 275, 245, 215, 185 -->
+              <!-- Internal coordinates calculated relative to center (200, 240) with radius = 64 -->
+              <!-- 1: angle 95 -> x = 200 + 64*cos(95-90) = 200 + 64*cos(5) = 263.7, y = 240 + 64*sin(5) = 245.5 -->
+              <circle class="dial-hole" data-digit="1" cx="263.7" cy="245.5" r="13" fill="#f4ebd0" fill-opacity="0.3" stroke="#dfb15b" stroke-width="1.5"/>
+              <!-- 2: angle 65 -> x = 200 + 64*cos(-25) = 258, y = 240 + 64*sin(-25) = 213 -->
+              <circle class="dial-hole" data-digit="2" cx="258" cy="213" r="13" fill="#f4ebd0" fill-opacity="0.3" stroke="#dfb15b" stroke-width="1.5"/>
+              <!-- 3: angle 35 -> x = 200 + 64*cos(-55) = 236.7, y = 240 + 64*sin(-55) = 187.6 -->
+              <circle class="dial-hole" data-digit="3" cx="236.7" cy="187.6" r="13" fill="#f4ebd0" fill-opacity="0.3" stroke="#dfb15b" stroke-width="1.5"/>
+              <!-- 4: angle 5 -> x = 200 + 64*cos(-85) = 205.5, y = 240 + 64*sin(-85) = 176.2 -->
+              <circle class="dial-hole" data-digit="4" cx="205.5" cy="176.2" r="13" fill="#f4ebd0" fill-opacity="0.3" stroke="#dfb15b" stroke-width="1.5"/>
+              <!-- 5: angle 335 -> x = 200 + 64*cos(-115) = 172.9, y = 240 + 64*sin(-115) = 182 -->
+              <circle class="dial-hole" data-digit="5" cx="172.9" cy="182" r="13" fill="#f4ebd0" fill-opacity="0.3" stroke="#dfb15b" stroke-width="1.5"/>
+              <!-- 6: angle 305 -> x = 200 + 64*cos(-145) = 147.5, y = 240 + 64*sin(-145) = 203.3 -->
+              <circle class="dial-hole" data-digit="6" cx="147.5" cy="203.3" r="13" fill="#f4ebd0" fill-opacity="0.3" stroke="#dfb15b" stroke-width="1.5"/>
+              <!-- 7: angle 275 -> x = 200 + 64*cos(-175) = 136.2, y = 240 + 64*sin(-175) = 234.4 -->
+              <circle class="dial-hole" data-digit="7" cx="136.2" cy="234.4" r="13" fill="#f4ebd0" fill-opacity="0.3" stroke="#dfb15b" stroke-width="1.5"/>
+              <!-- 8: angle 245 -> x = 200 + 64*cos(-205) = 142.3, y = 240 + 64*sin(-205) = 267 -->
+              <circle class="dial-hole" data-digit="8" cx="142.3" cy="267" r="13" fill="#f4ebd0" fill-opacity="0.3" stroke="#dfb15b" stroke-width="1.5"/>
+              <!-- 9: angle 215 -> x = 200 + 64*cos(-235) = 163.3, y = 240 + 64*sin(-235) = 292.4 -->
+              <circle class="dial-hole" data-digit="9" cx="163.3" cy="292.4" r="13" fill="#f4ebd0" fill-opacity="0.3" stroke="#dfb15b" stroke-width="1.5"/>
+              <!-- 0: angle 185 -> x = 200 + 64*cos(-265) = 194.4, y = 240 + 64*sin(-265) = 303.7 -->
+              <circle class="dial-hole" data-digit="0" cx="194.4" cy="303.7" r="13" fill="#f4ebd0" fill-opacity="0.3" stroke="#dfb15b" stroke-width="1.5"/>
+              
+              <!-- Spokes/Lines connecting center and holes for visual detail -->
+              <circle cx="200" cy="240" r="50" fill="none" stroke="rgba(223, 177, 91, 0.15)" stroke-width="1"/>
+            </g>
+
+            <!-- Stationary Brass Metal Finger Stop (Hole Stop Bracket) -->
+            <!-- Placed at angle ~135 degrees (bottom right, just clockwise after the 0 hole) -->
+            <!-- Stop x = 200 + 82*cos(135-90) = 200 + 82*cos(45) = 258, y = 240 + 82*sin(45) = 298 -->
+            <g>
+              <path d="M 245 285 L 268 308 L 273 293 Z" fill="url(#brass-grad)" stroke="#1a0d03" stroke-width="1.5"/>
+              <circle cx="245" cy="285" r="3" fill="#dfb15b"/>
+            </g>
+
+            <!-- The Telephone Handset / Receiver (Stops on Cradle, lifts off) -->
+            <!-- Default rests on x=200, y=80 -->
+            <g id="phone-receiver">
+              <!-- Left Ear Piece -->
+              <path d="M 40 85 Q 20 85 20 65 Q 20 45 40 45 L 60 45 Q 75 45 75 65 Q 75 85 60 85 Z" fill="url(#bakelite-grad)" stroke="#0d0607" stroke-width="1.5"/>
+              <!-- Right Mouth Piece -->
+              <path d="M 340 85 Q 325 85 325 65 Q 325 45 340 45 L 360 45 Q 380 45 380 65 Q 380 85 360 85 Z" fill="url(#bakelite-grad)" stroke="#0d0607" stroke-width="1.5"/>
+              <!-- Central Handlebar bar -->
+              <rect x="65" y="52" width="270" height="26" rx="10" fill="url(#bakelite-grad)" stroke="#0d0607" stroke-width="1.5"/>
+              <!-- Golden brass ring decorations -->
+              <rect x="75" y="48" width="10" height="34" rx="2" fill="url(#brass-grad)" stroke="#4a310c"/>
+              <rect x="315" y="48" width="10" height="34" rx="2" fill="url(#brass-grad)" stroke="#4a310c"/>
+            </g>
+
+            <!-- Definitions of Gradients -->
+            <defs>
+              <linearGradient id="bakelite-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#211718"/>
+                <stop offset="35%" stop-color="#120a0b"/>
+                <stop offset="70%" stop-color="#050102"/>
+                <stop offset="100%" stop-color="#1c1112"/>
+              </linearGradient>
+              <linearGradient id="brass-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffd885"/>
+                <stop offset="40%" stop-color="#dfb15b"/>
+                <stop offset="75%" stop-color="#a87a28"/>
+                <stop offset="100%" stop-color="#69460d"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <!-- Telephony State & Call dashboard panel -->
+        <div class="call-dashboard">
+          <h2 id="dashboard-match-name" class="call-title">Sarah</h2>
+          <p id="dashboard-match-phone" class="call-subtitle">Línea Fija: 4812</p>
+          
+          <div class="call-portrait-mini">
+            <img id="dashboard-match-portrait" src="assets/sarah.png" alt="Sarah">
+          </div>
+
+          <div id="call-status-text" class="call-status">Levanta el auricular para marcar</div>
+          
+          <!-- Pulsing Waveform Visualizer -->
+          <div id="pulse-waves" class="pulse-waves">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div class="dialed-screen">
+            <span id="dialed-digits">----</span>
+          </div>
+
+          <div style="margin-top: 2rem;">
+            <button id="btn-hangup" class="hangup-btn hidden">Colgar Teléfono</button>
+            <button id="btn-back-matches" class="vintage-btn" style="font-size: 1rem; padding: 0.6rem 1.5rem;">Volver a Matches</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="audio.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
