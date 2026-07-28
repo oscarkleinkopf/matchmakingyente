@@ -1,0 +1,22 @@
+# node / tooling
+node_modules/
+.npm/
+.cache/
+
+# Netlify
+.netlify/
+dist/
+.out/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+*.log
+
+# Env / secrets
+.env
+.env.*
+!.env.example
