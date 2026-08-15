@@ -96,13 +96,28 @@ Pendiente: persistencia del cortejo, más profundidad post-llamada, usuarios rea
 
 ## Deploy (Netlify)
 
-1. Un deploy a producción (el AI Gateway no se activa hasta entonces).
-2. En el dashboard del sitio: habilitar **AI Gateway / AI Features**.
-3. No configures `OPENAI_API_KEY` propia: Netlify la inyecta.
+1. Entra a la carpeta del repo (no a tu home). Ejemplo:
 
-```bash
-npm install
-npx netlify deploy --prod
+```powershell
+cd C:\Users\oscar\path\to\matchmakingyente
+```
+
+2. En **Windows PowerShell**, `npm`/`npx` suelen fallar con *running scripts is disabled*. Usa `npm.cmd` y `npx.cmd`, o abre **Símbolo del sistema (cmd)**.
+3. Un deploy a producción (el AI Gateway no se activa hasta entonces).
+4. En el dashboard del sitio: habilitar **AI Gateway / AI Features**.
+5. No configures `OPENAI_API_KEY` propia: Netlify la inyecta.
+
+```powershell
+npm.cmd install
+npx.cmd netlify login
+npx.cmd netlify init
+npx.cmd netlify deploy --prod
+```
+
+Si prefieres desbloquear scripts solo para tu usuario (una vez):
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 ```
 
 ---
