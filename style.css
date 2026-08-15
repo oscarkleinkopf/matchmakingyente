@@ -194,6 +194,15 @@ header p {
   color: var(--text-parchment);
 }
 
+.fiction-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  max-width: 520px;
+  margin: 0 auto 2rem;
+  line-height: 1.45;
+  font-style: italic;
+}
+
 .vintage-btn {
   background: linear-gradient(135deg, var(--velvet-mid) 0%, var(--velvet-dark) 100%);
   border: var(--border-gold-bright);

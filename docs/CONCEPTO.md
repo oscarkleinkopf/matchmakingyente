@@ -60,13 +60,13 @@ El objetivo no es nostalgia gratuita: es **hacer sentir** que el romance tiene p
 
 ## Norte de producto
 
-Corto plazo: pulir la demo inmersiva y desplegarla como sitio estático.
+Corto plazo: demo inmersiva desplegada, con Yente que lee de verdad las respuestas.
 
 Mediano plazo (si se valida el concepto):
 
-- Yente con IA que lee de verdad las respuestas.
-- Perfiles y números dinámicos.
 - Persistencia del progreso de cortejo.
+- Una carta o segunda llamada después del Mazel Tov.
 - Variantes culturales del ritual (no solo una estética).
+- Usuarios reales, pero con la misma fricción: Yente decide si entras.
 
 La brújula no cambia: **menos marketplace, más ceremony**.

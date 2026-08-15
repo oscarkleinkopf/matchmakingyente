@@ -1,0 +1,15 @@
+{
+  "name": "shidej",
+  "private": true,
+  "description": "Shidej — citas a la antigua. Experiencia de cortejo predigital.",
+  "scripts": {
+    "dev": "npx netlify dev",
+    "deploy": "npx netlify deploy --prod"
+  },
+  "dependencies": {
+    "openai": "^4.104.0"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.8.2"
+  }
+}

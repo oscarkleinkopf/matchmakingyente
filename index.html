@@ -36,8 +36,11 @@
         <p class="welcome-text">
           "El amor verdadero no se desliza en una pantalla. Se teje con paciencia, se sella con el alma y se respeta con honor."
         </p>
-        <p style="font-size: 1.2rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 2.5rem; font-style: italic;">
+        <p style="font-size: 1.2rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 1.5rem; font-style: italic;">
           Para encontrar a tu compañera ideal, primero debes presentarte ante <strong>Yente</strong>, nuestra casamentera tradicional. Ella evaluará tu carácter con preguntas profundas e insidiosas. Si demuestras madurez, te presentará a personas afines con quienes deberás comunicarte... de la única forma respetable: llamando a su hogar.
+        </p>
+        <p class="fiction-note">
+          El padre que a veces contesta el teléfono es ficción de esta experiencia, no un consejo de cortejo.
         </p>
         <button id="btn-start-consultation" class="vintage-btn">Iniciar Consulta</button>
       </div>
@@ -107,11 +110,23 @@
       </div>
     </div>
 
+    <!-- Screen 5a: Yente refuses to present anyone -->
+    <div id="screen-refusal" class="screen hidden">
+      <div class="gold-panel" style="max-width: 620px;">
+        <div class="thinking-yente">
+          <img src="assets/yente.png" alt="Yente">
+        </div>
+        <h2 class="call-title">No hay shidduch… todavía</h2>
+        <p id="refusal-verdict" class="welcome-text" style="font-size: 1.2rem; margin-top: 1rem;"></p>
+        <button id="btn-retry-consultation" class="vintage-btn">Volver a consultar</button>
+      </div>
+    </div>
+
     <!-- Screen 5: Matches List -->
     <div id="screen-matches" class="screen hidden">
       <h2 class="call-title" style="font-size: 2.2rem; margin-bottom: 0.2rem;">Tus Almas Compatibles</h2>
-      <p class="welcome-text" style="font-size: 1.15rem; margin-bottom: 1.5rem; text-align: center; max-width: 600px; color: var(--text-muted);">
-        "He encontrado tres damas de familias respetables cuyas almas resuenan con tus respuestas. Haz clic en su tarjeta para obtener su número e iniciar el cortejo."
+      <p id="matches-intro" class="welcome-text" style="font-size: 1.15rem; margin-bottom: 1.5rem; text-align: center; max-width: 600px; color: var(--text-muted);">
+        "He encontrado damas de familias respetables cuyas almas resuenan con tus respuestas. Haz clic en su tarjeta para obtener su número e iniciar el cortejo."
       </p>
       
       <div id="matches-grid" class="matches-grid">
@@ -236,31 +251,50 @@
 
         <!-- Telephony State & Call dashboard panel -->
         <div class="call-dashboard">
-          <h2 id="dashboard-match-name" class="call-title">Sarah</h2>
-          <p id="dashboard-match-phone" class="call-subtitle">Línea Fija: 4812</p>
-          
-          <div class="call-portrait-mini">
-            <img id="dashboard-match-portrait" src="assets/sarah.png" alt="Sarah">
+          <div id="call-live">
+            <h2 id="dashboard-match-name" class="call-title">Sarah</h2>
+            <p id="dashboard-match-phone" class="call-subtitle">Línea Fija: 4812</p>
+            
+            <div class="call-portrait-mini">
+              <img id="dashboard-match-portrait" src="assets/sarah.png" alt="Sarah">
+            </div>
+
+            <div id="call-status-text" class="call-status">Levanta el auricular para marcar</div>
+            
+            <!-- Pulsing Waveform Visualizer -->
+            <div id="pulse-waves" class="pulse-waves">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+            <div class="dialed-screen">
+              <span id="dialed-digits">----</span>
+            </div>
+
+            <div style="margin-top: 2rem;">
+              <button id="btn-hangup" class="hangup-btn hidden">Colgar Teléfono</button>
+              <button id="btn-back-matches" class="vintage-btn" style="font-size: 1rem; padding: 0.6rem 1.5rem;">Volver a Matches</button>
+            </div>
           </div>
 
-          <div id="call-status-text" class="call-status">Levanta el auricular para marcar</div>
-          
-          <!-- Pulsing Waveform Visualizer -->
-          <div id="pulse-waves" class="pulse-waves">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-
-          <div class="dialed-screen">
-            <span id="dialed-digits">----</span>
-          </div>
-
-          <div style="margin-top: 2rem;">
-            <button id="btn-hangup" class="hangup-btn hidden">Colgar Teléfono</button>
-            <button id="btn-back-matches" class="vintage-btn" style="font-size: 1rem; padding: 0.6rem 1.5rem;">Volver a Matches</button>
+          <div id="mazel-card" class="hidden">
+            <div class="welcome-logo">Mazel Tov!</div>
+            <div class="call-title">¡Se ha concertado tu encuentro!</div>
+            <div class="match-divider" style="background:#dfb15b; width: 80%;"></div>
+            <p class="welcome-text" style="font-size: 1.2rem; color: #f4ebd0; margin-top: 1rem;">
+              Has insistido con valentía frente al temperamento de su padre. <br>
+              <strong id="mazel-match-name"></strong> está ansiosa por conocerte cara a cara.
+            </p>
+            <p class="fiction-note" style="margin: 0 auto 1rem;">
+              Recuerda: esta escena es teatro de la demo, no un modelo de cortejo real.
+            </p>
+            <div class="call-portrait-mini" style="width: 180px; height: 180px; border: 4px double var(--accent-gold); border-radius: 8px; margin: 1.5rem auto;">
+              <img id="mazel-match-portrait" src="assets/sarah.png" style="border-radius:0;" alt="">
+            </div>
+            <button id="btn-back-unions" class="vintage-btn" style="margin-top: 1rem;">Volver a las otras almas</button>
           </div>
         </div>
 

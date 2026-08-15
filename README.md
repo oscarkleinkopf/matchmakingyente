@@ -55,23 +55,25 @@ Luego:
 
 ```
 .
-├── index.html          # Pantallas y UI del teléfono rotatorio (SVG)
-├── style.css           # Estética vintage (terciopelo, oro, pergamino)
-├── app.js              # Flujo narrativo, matches y física del dial
-├── audio.js            # Síntesis Web Audio + SpeechSynthesis
-├── assets/             # Retratos (Yente, Sarah, Miriam, Leah)
+├── index.html
+├── style.css
+├── app.js
+├── audio.js
+├── assets/
+├── netlify.toml
+├── netlify/functions/yente.ts   # Yente (IA) — reacciona y elige matches
 └── docs/
-    ├── CONCEPTO.md     # Visión de producto y posicionamiento
-    └── EXPERIENCIA.md  # Mapa del journey del usuario
 ```
 
-No hay backend ni dependencias de build: es un sitio estático puro.
+Sitio estático + una función serverless. En local, `npm run dev` (`netlify dev`) sirve el HTML y `/api/yente`.
 
 ---
 
 ## Stack
 
 - HTML / CSS / JavaScript (vanilla)
+- **Netlify Functions** — `/api/yente`
+- **Netlify AI Gateway** (OpenAI `gpt-4o-mini`) — Yente lee las respuestas; no hace falta API key de proveedor
 - **Web Audio API** — tono de marcado, timbre, busy, clics mecánicos, estática de línea
 - **SpeechSynthesis** — voces del padre y de la candidata
 - Tipografías: Cinzel Decorative, Cormorant Garamond, Pinyon Script
@@ -80,15 +82,28 @@ No hay backend ni dependencias de build: es un sitio estático puro.
 
 ## Estado actual
 
-Prototipo jugable de extremo a extremo:
+Prototipo jugable de extremo a extremo, ahora con juicio de Yente:
 
-- Entrevista scripted con Yente (4 preguntas)
-- Upload local de retrato
-- Tres matches fijos con números de 4 dígitos
-- Teléfono rotatorio interactivo
-- Narrativa de llamadas (padre × 3 → hija en la 4.ª)
+- Entrevista de 4 preguntas; Yente **comenta lo que escribiste** (si el API no está, usa un guion de respaldo)
+- Puede rechazar respuestas perezosas y pedir otra
+- Tras el retrato, **elige y ordena** entre Sarah, Miriam y Leah — o se niega a presentar a nadie
+- Teléfono rotatorio + narrativa de llamadas (padre × 3 → hija en la 4.ª)
+- Tras Mazel Tov puedes volver a las otras almas **sin recargar**
 
-Pendiente para una versión de producto: matching dinámico, IA para Yente, persistencia, más perfiles y despliegue en hosting (p. ej. Netlify).
+Pendiente: persistencia del cortejo, más profundidad post-llamada, usuarios reales.
+
+---
+
+## Deploy (Netlify)
+
+1. Un deploy a producción (el AI Gateway no se activa hasta entonces).
+2. En el dashboard del sitio: habilitar **AI Gateway / AI Features**.
+3. No configures `OPENAI_API_KEY` propia: Netlify la inyecta.
+
+```bash
+npm install
+npx netlify deploy --prod
+```
 
 ---
 

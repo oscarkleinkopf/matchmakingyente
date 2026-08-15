@@ -1,6 +1,6 @@
 # Experiencia de usuario — Shidej
 
-Mapa del journey actual del prototipo (sitio estático, sin backend).
+Mapa del journey actual (sitio estático + función `/api/yente`).
 
 ## Flujo completo
 
@@ -25,9 +25,10 @@ Mapa del journey actual del prototipo (sitio estático, sin backend).
 
 ### 2. Entrevista con Yente
 
-- Cuatro preguntas de carácter (script fijo en `app.js`).
-- Efecto máquina de escribir + indicador de escritura.
-- El texto del usuario se acepta; en el prototipo **no se analiza** (feedback narrativo prefijado).
+- Cuatro preguntas de carácter (texto fijo en `app.js`).
+- Cada respuesta se envía a `/api/yente` (`action: "react"`).
+- Yente comenta algo concreto de lo escrito; si la respuesta es perezosa, **no avanza** y pide otra (un reintento por pregunta).
+- Si el API no está disponible (abrir `index.html` sin Netlify), usa el guion de respaldo.
 - Al terminar → pantalla de retrato.
 
 ### 3. Retrato personal
@@ -38,12 +39,13 @@ Mapa del journey actual del prototipo (sitio estático, sin backend).
 
 ### 4. Reflexión (“Yente está reflexionando…”)
 
-- Beat de suspense (~pocos segundos).
-- Transición a la lista de almas compatibles.
+- Llama a `/api/yente` (`action: "match"`) mientras muestra el beat de suspense.
+- Si hay carácter suficiente → lista de matches **ordenada y recortada** (1 a 3 de Sarah, Miriam y Leah).
+- Si no → pantalla de rechazo y **Volver a consultar**.
 
 ### 5. Matches
 
-Tres perfiles fijos:
+Hasta tres perfiles fijos (Yente decide cuáles y en qué orden):
 
 | Nombre | Teléfono | Notas |
 | --- | --- | --- |
@@ -72,7 +74,7 @@ El contador es por persona (`sarah` / `miriam` / `leah`), no global.
 ### 7. Mazel Tov
 
 - Confirmación de encuentro concertado.
-- CTA: **Buscar otra unión** (recarga la página y reinicia el estado).
+- CTA: **Volver a las otras almas** (no recarga la página; el progreso de llamadas se conserva).
 
 ## Diseño de sonido (resumen)
 
@@ -88,7 +90,6 @@ Implementado en `audio.js`:
 
 ## Notas de UX para futuras iteraciones
 
-- Feedback de Yente debería depender del contenido real de la respuesta.
-- Tras “Mazel Tov”, permitir volver a matches sin `location.reload()`.
+- Persistir el cortejo entre visitas.
 - Mejorar accesibilidad del dial en móvil (targets táctiles, instrucciones visibles).
-- Dejar explícito en UI que la insistencia frente al padre es **juego narrativo**, no consejo de vida real.
+- Una carta o segunda llamada después del Mazel Tov.

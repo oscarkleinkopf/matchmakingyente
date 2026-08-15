@@ -14,7 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
     upload: document.getElementById("screen-upload"),
     thinking: document.getElementById("screen-thinking"),
     matches: document.getElementById("screen-matches"),
-    telephony: document.getElementById("screen-telephony")
+    telephony: document.getElementById("screen-telephony"),
+    refusal: document.getElementById("screen-refusal")
   };
 
   // State Variables
@@ -22,6 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let userPortraitUrl = null;
   let selectedMatch = null;
   let dialedNumber = "";
+  let interviewHistory = [];
+  let presentedMatchIds = ["sarah", "miriam", "leah"];
+  let retriesOnCurrentQuestion = 0;
+  let yenteRequestInFlight = false;
   
   // Call count tracker per match to manage the threatening father interactions
   const matchCallCounts = {
@@ -80,6 +85,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentQuestionIndex = 0;
 
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function requestYente(payload) {
+    const response = await fetch("/api/yente", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      throw new Error(`Yente API ${response.status}`);
+    }
+    return response.json();
+  }
+
   // Initialize App
   function showScreen(screenId) {
     Object.keys(screens).forEach(key => {
@@ -115,83 +136,119 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function startInterview() {
     currentQuestionIndex = 0;
+    retriesOnCurrentQuestion = 0;
+    interviewHistory = [];
     chatMessages.innerHTML = "";
     askQuestion();
   }
 
   function appendMessage(text, sender) {
-    const msgDiv = document.createElement("div");
-    msgDiv.classList.add("message", sender);
-    
-    if (sender === "yente") {
-      // Typewriter effect for Yente's voice
-      msgDiv.innerHTML = "";
-      chatMessages.appendChild(msgDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      
-      let i = 0;
-      btnSend.disabled = true;
-      chatInput.disabled = true;
-      
-      // Add typing dots indicator
-      const typingIndicator = document.createElement("div");
-      typingIndicator.className = "typing-indicator";
-      typingIndicator.innerHTML = "<span></span><span></span><span></span>";
-      chatMessages.appendChild(typingIndicator);
-      
-      const timer = setInterval(() => {
-        if (i < text.length) {
-          msgDiv.innerHTML += text.charAt(i);
-          i++;
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        } else {
-          clearInterval(timer);
-          typingIndicator.remove();
-          btnSend.disabled = false;
-          chatInput.disabled = false;
-          chatInput.focus();
-        }
-      }, 15);
-    } else {
-      msgDiv.textContent = text;
-      chatMessages.appendChild(msgDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+    return new Promise((resolve) => {
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", sender);
+
+      if (sender === "yente") {
+        msgDiv.textContent = "";
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        let i = 0;
+        btnSend.disabled = true;
+        chatInput.disabled = true;
+
+        const typingIndicator = document.createElement("div");
+        typingIndicator.className = "typing-indicator";
+        typingIndicator.innerHTML = "<span></span><span></span><span></span>";
+        chatMessages.appendChild(typingIndicator);
+
+        const timer = setInterval(() => {
+          if (i < text.length) {
+            msgDiv.textContent += text.charAt(i);
+            i++;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          } else {
+            clearInterval(timer);
+            typingIndicator.remove();
+            btnSend.disabled = false;
+            chatInput.disabled = false;
+            chatInput.focus();
+            resolve();
+          }
+        }, 15);
+      } else {
+        msgDiv.textContent = text;
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        resolve();
+      }
+    });
   }
 
-  function askQuestion() {
+  async function askQuestion() {
     if (currentQuestionIndex < yenteInterview.length) {
-      appendMessage(yenteInterview[currentQuestionIndex].question, "yente");
-    } else {
-      // Transition to photo upload after last question
-      appendMessage("Bien. Tus palabras muestran una profundidad que me agrada. Ahora, entrégame tu retrato. Uno solo. Sin filtros, sin pretensiones. Que tu mirada hable por ti.", "yente");
-      setTimeout(() => {
-        showScreen("upload");
-      }, 4000);
+      await appendMessage(yenteInterview[currentQuestionIndex].question, "yente");
+      return;
     }
+
+    await appendMessage(
+      "Bien. Tus palabras muestran una profundidad que me agrada. Ahora, entrégame tu retrato. Uno solo. Sin filtros, sin pretensiones. Que tu mirada hable por ti.",
+      "yente"
+    );
+    await sleep(1200);
+    showScreen("upload");
   }
 
-  function handleUserAnswer() {
+  async function handleUserAnswer() {
     const answerText = chatInput.value.trim();
-    if (!answerText) return;
+    if (!answerText || yenteRequestInFlight) return;
 
     chatInput.value = "";
-    appendMessage(answerText, "user");
+    await appendMessage(answerText, "user");
 
-    // Disable inputs
     btnSend.disabled = true;
     chatInput.disabled = true;
+    yenteRequestInFlight = true;
 
-    // Yente reacts and then asks the next question
-    setTimeout(() => {
-      const feedbackText = yenteInterview[currentQuestionIndex].feedback;
-      appendMessage(feedbackText, "yente");
+    const waiting = document.createElement("div");
+    waiting.className = "typing-indicator";
+    waiting.innerHTML = "<span></span><span></span><span></span>";
+    chatMessages.appendChild(waiting);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    const question = yenteInterview[currentQuestionIndex].question;
+    let feedbackText = yenteInterview[currentQuestionIndex].feedback;
+    let accepted = true;
+
+    try {
+      const result = await requestYente({
+        action: "react",
+        questionIndex: currentQuestionIndex,
+        question,
+        answer: answerText,
+        history: interviewHistory
+      });
+      if (typeof result.feedback === "string" && result.feedback.trim()) {
+        feedbackText = result.feedback.trim();
+      }
+      accepted = result.accepted !== false;
+    } catch (error) {
+      console.warn("Yente API unavailable, using scripted feedback.", error);
+    } finally {
+      waiting.remove();
+      yenteRequestInFlight = false;
+    }
+
+    await appendMessage(feedbackText, "yente");
+
+    if (accepted || retriesOnCurrentQuestion >= 1) {
+      interviewHistory.push({ question, answer: answerText, feedback: feedbackText });
       currentQuestionIndex++;
-      
-      setTimeout(() => {
-        askQuestion();
-      }, 3500);
-    }, 1500);
+      retriesOnCurrentQuestion = 0;
+      await sleep(700);
+      await askQuestion();
+    } else {
+      retriesOnCurrentQuestion++;
+    }
   }
 
   btnSend.addEventListener("click", handleUserAnswer);
@@ -250,17 +307,63 @@ document.addEventListener("DOMContentLoaded", () => {
     btnSubmitPortrait.disabled = false;
   }
 
-  btnSubmitPortrait.addEventListener("click", () => {
+  btnSubmitPortrait.addEventListener("click", async () => {
     if (!userPortraitUrl) return;
-    
-    // Step 4: Show matchmaker assessment ("Thinking")
+
     showScreen("thinking");
-    
-    // Simulate Yente deep analysis
-    setTimeout(() => {
-      showScreen("matches");
-      renderMatches();
-    }, 5000);
+    const started = Date.now();
+
+    const fallbackIntro =
+      "He encontrado damas de familias respetables cuyas almas resuenan con tus respuestas. Haz clic en su tarjeta para obtener su número e iniciar el cortejo.";
+    let presented = true;
+    let matchIds = ["sarah", "miriam", "leah"];
+    let introduction = fallbackIntro;
+    let verdict =
+      "No. Con lo que me has dado no arriesgo el nombre de ninguna familia respetable. Vuelve cuando tengas algo que decir.";
+
+    try {
+      const result = await requestYente({
+        action: "match",
+        history: interviewHistory
+      });
+      presented = result.presented === true;
+      if (Array.isArray(result.matchIds) && result.matchIds.length > 0) {
+        matchIds = result.matchIds.filter((id) => matchesData[id]);
+      }
+      if (typeof result.introduction === "string" && result.introduction.trim()) {
+        introduction = result.introduction.trim();
+      }
+      if (typeof result.verdict === "string" && result.verdict.trim()) {
+        verdict = result.verdict.trim();
+      }
+      if (!presented || matchIds.length === 0) {
+        presented = false;
+      }
+    } catch (error) {
+      console.warn("Yente match API unavailable, presenting all three.", error);
+      presented = true;
+    }
+
+    const elapsed = Date.now() - started;
+    if (elapsed < 2200) {
+      await sleep(2200 - elapsed);
+    }
+
+    if (!presented) {
+      document.getElementById("refusal-verdict").textContent = verdict;
+      showScreen("refusal");
+      return;
+    }
+
+    presentedMatchIds = matchIds;
+    document.getElementById("matches-intro").textContent = `"${introduction}"`;
+    showScreen("matches");
+    renderMatches();
+  });
+
+  document.getElementById("btn-retry-consultation").addEventListener("click", () => {
+    showScreen("chat");
+    startInterview();
   });
 
   // MATCHES LIST SCREEN
@@ -268,9 +371,10 @@ document.addEventListener("DOMContentLoaded", () => {
   
   function renderMatches() {
     matchesGrid.innerHTML = "";
-    
-    Object.keys(matchesData).forEach(key => {
+
+    presentedMatchIds.forEach((key) => {
       const match = matchesData[key];
+      if (!match) return;
       const card = document.createElement("div");
       card.className = "match-card";
       card.innerHTML = `
@@ -283,11 +387,11 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="match-bio">"${match.bio}"</div>
         <div class="match-phone-tag">Tel: ${match.phone}</div>
       `;
-      
+
       card.addEventListener("click", () => {
         setupTelephonyScreen(match);
       });
-      
+
       matchesGrid.appendChild(card);
     });
   }
@@ -304,6 +408,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const dashboardPhone = document.getElementById("dashboard-match-phone");
   const btnHangup = document.getElementById("btn-hangup");
   const btnBackMatches = document.getElementById("btn-back-matches");
+  const callLive = document.getElementById("call-live");
+  const mazelCard = document.getElementById("mazel-card");
+  const mazelMatchName = document.getElementById("mazel-match-name");
+  const mazelMatchPortrait = document.getElementById("mazel-match-portrait");
+  const btnBackUnions = document.getElementById("btn-back-unions");
 
   let isReceiverOffHook = false;
   let activeCallState = "idle"; // idle, ringing, speaking, disconnected, finished
@@ -327,7 +436,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     btnHangup.classList.add("hidden");
     btnBackMatches.classList.remove("hidden");
-    
+    callLive.classList.remove("hidden");
+    mazelCard.classList.add("hidden");
+
     showScreen("telephony");
   }
 
@@ -664,26 +775,25 @@ document.addEventListener("DOMContentLoaded", () => {
     activeCallState = "finished";
     callStatusText.textContent = "¡COMPATIBILIDAD CONFIRMADA!";
     audio.playLineCrackle();
-    
+
+    mazelMatchName.textContent = selectedMatch.name;
+    mazelMatchPortrait.src = selectedMatch.image;
+    mazelMatchPortrait.alt = selectedMatch.name;
+
     setTimeout(() => {
-      // Visual golden sparks/fireworks or romantic vintage celebration card!
-      screens.telephony.querySelector(".call-dashboard").innerHTML = `
-        <div class="welcome-logo">Mazel Tov!</div>
-        <div class="call-title">¡Se ha concertado tu encuentro!</div>
-        <div class="match-divider" style="background:#dfb15b; width: 80%;"></div>
-        <p class="welcome-text" style="font-size: 1.2rem; color: #f4ebd0; margin-top: 1rem;">
-          Has insistido con valentía frente al temperamento de su padre. <br>
-          <strong>${selectedMatch.name}</strong> está ansiosa por conocerte cara a cara.
-        </p>
-        <div class="call-portrait-mini" style="width: 180px; height: 180px; border: 4px double var(--accent-gold); border-radius: 8px; margin: 1.5rem auto;">
-          <img src="${selectedMatch.image}" style="border-radius:0;" alt="${selectedMatch.name}">
-        </div>
-        <button id="btn-restart" class="vintage-btn" style="margin-top: 1rem;">Buscar otra unión</button>
-      `;
-      
-      document.getElementById("btn-restart").addEventListener("click", () => {
-        location.reload();
-      });
-    }, 2000);
+      callLive.classList.add("hidden");
+      mazelCard.classList.remove("hidden");
+    }, 1600);
   }
+
+  btnBackUnions.addEventListener("click", () => {
+    audio.stopVoice();
+    audio.stopDialTone();
+    audio.stopRingTone();
+    audio.stopBusyTone();
+    hangupReceiver();
+    callLive.classList.remove("hidden");
+    mazelCard.classList.add("hidden");
+    showScreen("matches");
+  });
 });
